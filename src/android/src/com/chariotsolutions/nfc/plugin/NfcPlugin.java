@@ -582,12 +582,12 @@ public class NfcPlugin extends CordovaPlugin implements NfcAdapter.OnNdefPushCom
 
             if (nfcAdapter == null) {
                 callbackContext.error(STATUS_NO_NFC);
-            } else if (!nfcAdapter.isNdefPushEnabled()) {
-                callbackContext.error(STATUS_NDEF_PUSH_DISABLED);
+            // } else if (!nfcAdapter.isNdefPushEnabled()) {
+            //     callbackContext.error(STATUS_NDEF_PUSH_DISABLED);
             } else {
-                nfcAdapter.setOnNdefPushCompleteCallback(NfcPlugin.this, getActivity());
+                // nfcAdapter.setOnNdefPushCompleteCallback(NfcPlugin.this, getActivity());
                 try {
-                    nfcAdapter.setBeamPushUris(uris, getActivity());
+                    // nfcAdapter.setBeamPushUris(uris, getActivity());
 
                     PluginResult result = new PluginResult(PluginResult.Status.NO_RESULT);
                     result.setKeepCallback(true);
@@ -608,11 +608,11 @@ public class NfcPlugin extends CordovaPlugin implements NfcAdapter.OnNdefPushCom
 
             if (nfcAdapter == null) {
                 callbackContext.error(STATUS_NO_NFC);
-            } else if (!nfcAdapter.isNdefPushEnabled()) {
-                callbackContext.error(STATUS_NDEF_PUSH_DISABLED);
+            // } else if (!nfcAdapter.isNdefPushEnabled()) {
+            //     callbackContext.error(STATUS_NDEF_PUSH_DISABLED);
             } else {
-                nfcAdapter.setNdefPushMessage(p2pMessage, getActivity());
-                nfcAdapter.setOnNdefPushCompleteCallback(NfcPlugin.this, getActivity());
+                // nfcAdapter.setNdefPushMessage(p2pMessage, getActivity());
+                // nfcAdapter.setOnNdefPushCompleteCallback(NfcPlugin.this, getActivity());
 
                 PluginResult result = new PluginResult(PluginResult.Status.NO_RESULT);
                 result.setKeepCallback(true);
@@ -623,27 +623,27 @@ public class NfcPlugin extends CordovaPlugin implements NfcAdapter.OnNdefPushCom
     }
 
     private void stopNdefPush() {
-        getActivity().runOnUiThread(() -> {
+        // getActivity().runOnUiThread(() -> {
 
-            NfcAdapter nfcAdapter = NfcAdapter.getDefaultAdapter(getActivity());
+        //     NfcAdapter nfcAdapter = NfcAdapter.getDefaultAdapter(getActivity());
 
-            if (nfcAdapter != null) {
-                nfcAdapter.setNdefPushMessage(null, getActivity());
-            }
+        //     if (nfcAdapter != null) {
+        //         nfcAdapter.setNdefPushMessage(null, getActivity());
+        //     }
 
-        });
+        // });
     }
 
     private void stopNdefBeam() {
-        getActivity().runOnUiThread(() -> {
+        // getActivity().runOnUiThread(() -> {
 
-            NfcAdapter nfcAdapter = NfcAdapter.getDefaultAdapter(getActivity());
+        //     NfcAdapter nfcAdapter = NfcAdapter.getDefaultAdapter(getActivity());
 
-            if (nfcAdapter != null) {
-                nfcAdapter.setBeamPushUris(null, getActivity());
-            }
+        //     if (nfcAdapter != null) {
+        //         nfcAdapter.setBeamPushUris(null, getActivity());
+        //     }
 
-        });
+        // });
     }
 
     private void addToTechList(String[] techs) {
