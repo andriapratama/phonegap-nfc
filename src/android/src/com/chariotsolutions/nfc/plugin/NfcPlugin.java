@@ -623,7 +623,7 @@ public class NfcPlugin extends CordovaPlugin implements NfcAdapter.OnNdefPushCom
     }
 
     private void stopNdefPush() {
-        // getActivity().runOnUiThread(() -> {
+        getActivity().runOnUiThread(() -> {
 
         //     NfcAdapter nfcAdapter = NfcAdapter.getDefaultAdapter(getActivity());
 
@@ -631,11 +631,11 @@ public class NfcPlugin extends CordovaPlugin implements NfcAdapter.OnNdefPushCom
         //         nfcAdapter.setNdefPushMessage(null, getActivity());
         //     }
 
-        // });
+        });
     }
 
     private void stopNdefBeam() {
-        // getActivity().runOnUiThread(() -> {
+        getActivity().runOnUiThread(() -> {
 
         //     NfcAdapter nfcAdapter = NfcAdapter.getDefaultAdapter(getActivity());
 
@@ -643,7 +643,7 @@ public class NfcPlugin extends CordovaPlugin implements NfcAdapter.OnNdefPushCom
         //         nfcAdapter.setBeamPushUris(null, getActivity());
         //     }
 
-        // });
+        });
     }
 
     private void addToTechList(String[] techs) {
