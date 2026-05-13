@@ -479,18 +479,26 @@ public class NfcPlugin extends CordovaPlugin implements NfcAdapter.OnNdefPushCom
     }
 
     private void createPendingIntent() {
-        if (pendingIntent == null) {
-            Activity activity = getActivity();
-            Intent intent = new Intent(activity, activity.getClass());
-            intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
-            
-            int flags = PendingIntent.FLAG_SINGLE_TOP;
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
-                flags |= PendingIntent.FLAG_MUTABLE; 
-            }
-            
-            pendingIntent = PendingIntent.getActivity(activity, 0, intent, flags);
+
+        Activity activity = getActivity();
+
+        if (activity == null) {
+            Log.e(TAG, "Activity is null while creating PendingIntent");
+            return;
         }
+
+        Intent intent = new Intent(activity, activity.getClass());
+
+        intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+
+        pendingIntent = PendingIntent.getActivity(
+            activity,
+            0,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_MUTABLE
+        );
+
+        Log.d(TAG, "PendingIntent created: " + pendingIntent);
     }
 
     private void addTechList(String[] list) {
@@ -537,29 +545,52 @@ public class NfcPlugin extends CordovaPlugin implements NfcAdapter.OnNdefPushCom
     }
 
     private void startNfc() {
-        createPendingIntent(); // onResume can call startNfc before execute
+        createPendingIntent();
 
         getActivity().runOnUiThread(() -> {
-            NfcAdapter nfcAdapter = NfcAdapter.getDefaultAdapter(getActivity());
 
-            if (nfcAdapter != null && !getActivity().isFinishing()) {
-                try {
-                    IntentFilter[] intentFilters = getIntentFilters();
-                    String[][] techLists = getTechLists();
-                    // don't start NFC unless some intent filters or tech lists have been added,
-                    // because empty lists act as wildcards and receives ALL scan events
-                    if (intentFilters.length > 0 || techLists.length > 0) {
-                        nfcAdapter.enableForegroundDispatch(getActivity(), getPendingIntent(), intentFilters, techLists);
-                    }
+            Activity activity = getActivity();
 
-                    // if (p2pMessage != null) {
-                    //     nfcAdapter.setNdefPushMessage(p2pMessage, getActivity());
-                    // }
-                } catch (IllegalStateException e) {
-                    // issue 110 - user exits app with home button while nfc is initializing
-                    Log.w(TAG, "Illegal State Exception starting NFC. Assuming application is terminating.");
+            if (activity == null || activity.isFinishing()) {
+                Log.e(TAG, "Activity is null or finishing");
+                return;
+            }
+
+            NfcAdapter nfcAdapter = NfcAdapter.getDefaultAdapter(activity);
+
+            if (nfcAdapter == null) {
+                Log.e(TAG, "NFC Adapter is null");
+                return;
+            }
+
+            PendingIntent pendingIntent = getPendingIntent();
+
+            if (pendingIntent == null) {
+                Log.e(TAG, "PendingIntent is null");
+                return;
+            }
+
+            try {
+
+                IntentFilter[] intentFilters = getIntentFilters();
+                String[][] techLists = getTechLists();
+
+                if (
+                    intentFilters != null &&
+                    techLists != null &&
+                    (intentFilters.length > 0 || techLists.length > 0)
+                ) {
+
+                    nfcAdapter.enableForegroundDispatch(
+                        activity,
+                        pendingIntent,
+                        intentFilters,
+                        techLists
+                    );
                 }
 
+            } catch (IllegalStateException e) {
+                Log.w(TAG, "Illegal State Exception starting NFC.");
             }
         });
     }
@@ -631,7 +662,7 @@ public class NfcPlugin extends CordovaPlugin implements NfcAdapter.OnNdefPushCom
     private void stopNdefPush() {
         getActivity().runOnUiThread(() -> {
 
-        //     NfcAdapter nfcAdapter = NfcAdapter.getDefaultAdapter(getActivity());
+            NfcAdapter nfcAdapter = NfcAdapter.getDefaultAdapter(getActivity());
 
         //     if (nfcAdapter != null) {
         //         nfcAdapter.setNdefPushMessage(null, getActivity());
@@ -643,7 +674,7 @@ public class NfcPlugin extends CordovaPlugin implements NfcAdapter.OnNdefPushCom
     private void stopNdefBeam() {
         getActivity().runOnUiThread(() -> {
 
-        //     NfcAdapter nfcAdapter = NfcAdapter.getDefaultAdapter(getActivity());
+            NfcAdapter nfcAdapter = NfcAdapter.getDefaultAdapter(getActivity());
 
         //     if (nfcAdapter != null) {
         //         nfcAdapter.setBeamPushUris(null, getActivity());
@@ -684,6 +715,11 @@ public class NfcPlugin extends CordovaPlugin implements NfcAdapter.OnNdefPushCom
     }
 
     private PendingIntent getPendingIntent() {
+
+        if (pendingIntent == null) {
+            createPendingIntent();
+        }
+
         return pendingIntent;
     }
 
